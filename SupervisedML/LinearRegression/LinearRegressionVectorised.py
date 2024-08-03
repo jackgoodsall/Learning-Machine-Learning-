@@ -19,7 +19,7 @@ class LinearRegression:
 
         w = np.dot( np.linalg.pinv(np.dot(self.X.T, self.X)) , np.dot(self.X.T, self.y))
         print(w.shape, self.X.shape)
-        return np.dot(self.X.T, w)
+        return np.dot(self.X, w)
     
 X = np.linspace((0, 10, 50), (100, 200, 1000), 200)
 y = np.linspace(0, 1000, 200) 

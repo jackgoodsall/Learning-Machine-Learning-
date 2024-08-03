@@ -16,31 +16,36 @@ class LogisticRegression:
         # Uses stochiastic regression to fit logistic regression using a sigmoid funciton
         
         # Create X array
-        self.X = np.ones((len(y), X.shape[1] + 1))
+        p, q = X.shape
+
+        self.X = np.ones((p, q  + 1))
         self.X[:, 1:] = X
+
         # Save y arrays
-        self.y = y
+        self.y = y.reshape(p, 1)
         # Create m array
-        m : np.ndarray = np.zeros(self.X.shape[1])
+        m : np.ndarray = np.zeros((q + 1, 1))
+        
         # Stochiastic Gradient descent    
         for count, value  in enumerate(y):
             #print(alpha * (value - self._sigmoid_function(count, m) ) * self.X[count])
-            print(self.X[count])
-            m = m + alpha * (value - self._sigmoid_function_gradient(count, m) ) * self.X[count]
-        return 1/ (1 + np.exp(-np.dot(m, self.X.T)))
+            m = m + alpha * (value - self._sigmoid_function(count, m) ) * self.X[count , :]
+
+        return 1/ (1 + np.exp(-np.dot(self.X, m)))
 
 
 
     def _sigmoid_function(self, row, m):
         # Calculate value of sigmoid function 
-        z = np.dot(m, self.X[row])
+        print(self.X[row, :].T , m)
+        z = np.dot(self.X[row, :], m)
         num = 1
         denom = 1 + np.exp( - z )
         return num / denom
 
     def _sigmoid_function_gradient(self, row, m):
         # Calculate value of the gradient of the sigmoid funciton
-        z = np.dot(m, self.X[row])
+        z = np.dot(self.X[row, :] , m)
         num = 1
         denom = 1 + np.exp( - z )
         g_z = num / denom
