@@ -6,53 +6,63 @@ warnings.filterwarnings('ignore')
 
 class LogisticRegression:
 
-    def __init__(self):
+    def __init__(self) -> None:
         
-        self.X : np.ndarray = np.array([])
-        self.y : np.ndarray = np.array([])
+        pass
 
-    def fit(self, X : np.ndarray, y : np.ndarray, alpha : float = 0.005):
+    def fit(self, X : np.ndarray, y : np.ndarray, alpha : float = 1, epoches : int = 100) -> None:
 
         # Uses stochiastic regression to fit logistic regression using a sigmoid funciton
         
-        # Create X array
-        p, q = X.shape
+        # m is the number of 
+        m : int = X.shape[0]
+        # n number of features
+        n : int = X.shape[1]
 
-        self.X = np.ones((p, q  + 1))
-        self.X[:, 1:] = X
+        # Create X array shape (m, n + 1)
+        X_train : np.ndarray = np.ones((m, n  + 1))
+        
+        # X_0 = 1
+        X_train[:, 1:] = X
 
-        # Save y arrays
-        self.y = y.reshape(p, 1)
-        # Create m array
-        m : np.ndarray = np.zeros((q + 1, 1))
+        # Save y values and ensure it is a matrix (could be an array other wise and seems to break iot )
+        y_train : np.ndarray = y.reshape(m, 1)
+        # Create theta array
+        theta : np.ndarray = np.zeros((n + 1, 1))
         
         # Stochiastic Gradient descent    
-        for count, value  in enumerate(y):
-            #print(alpha * (value - self._sigmoid_function(count, m) ) * self.X[count])
-            m = m + alpha * (value - self._sigmoid_function(count, m) ) * self.X[count , :]
+        for _ in range(epoches):    
+            for count, value  in enumerate(y):
+                row = X_train[count, ].reshape((1, n + 1))
+                yhat = float(self._sigmoid_function(row, theta))
+                theta = theta + alpha * (value - yhat ) * (yhat) * ( 1- yhat) * row.T
+            
+        self.theta : np.ndarray = theta
+        return None
+        
 
-        return 1/ (1 + np.exp(-np.dot(self.X, m)))
 
 
-
-    def _sigmoid_function(self, row, m):
+    def _sigmoid_function(self, row, m) -> float | np.ndarray:
         # Calculate value of sigmoid function 
-        print(self.X[row, :].T , m)
-        z = np.dot(self.X[row, :], m)
+        z = np.dot(row, m)
         num = 1
         denom = 1 + np.exp( - z )
         return num / denom
 
-    def _sigmoid_function_gradient(self, row, m):
-        # Calculate value of the gradient of the sigmoid funciton
-        z = np.dot(self.X[row, :] , m)
-        num = 1
-        denom = 1 + np.exp( - z )
-        g_z = num / denom
-        gradient = g_z* (1 - g_z)
-        return  gradient
-    
+    def predict(self, X):
+        # Model to predict outcome after the model has been taught
+         # m is the number of 
+        m : int = X.shape[0]
+        # n number of features
+        n : int = X.shape[1]
 
+        # Create X array shape (m, n + 1)
+        X_test : np.ndarray = np.ones((m, n  + 1))
+        X_test[:, 1:] = X
+
+
+        return self._sigmoid_function(X_test, self.theta)
         
 
 
@@ -62,10 +72,11 @@ y = np.array([1 if i > 0 else 0 for i in x])
 
 
 model = LogisticRegression()
-pred = model.fit(x , y)
+model.fit(x , y)
+predictions = model.predict(x)
 
 
 plt.figure()
 plt.scatter(x , y)
-plt.plot(x , pred)
+plt.plot(x , predictions)
 plt.show()
