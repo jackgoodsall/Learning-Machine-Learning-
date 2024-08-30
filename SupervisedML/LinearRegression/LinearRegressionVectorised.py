@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import torch
 
 class LinearRegression:
 
@@ -33,3 +34,5 @@ plt.figure()
 plt.scatter(X[:, 0], y)
 plt.plot(X[:,0 ], pred)
 plt.show()
+
+

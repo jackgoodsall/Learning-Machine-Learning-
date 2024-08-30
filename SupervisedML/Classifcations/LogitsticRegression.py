@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression as LR
 import warnings
 
 warnings.filterwarnings('ignore') 
@@ -10,7 +11,7 @@ class LogisticRegression:
         
         pass
 
-    def fit(self, X : np.ndarray, y : np.ndarray, alpha : float = 1, epoches : int = 100) -> None:
+    def fit(self, X : np.ndarray, y : np.ndarray, alpha : float = 1, epoches : int = 10) -> None:
 
         # Uses stochiastic regression to fit logistic regression using a sigmoid funciton
         
@@ -35,7 +36,7 @@ class LogisticRegression:
             for count, value  in enumerate(y):
                 row = X_train[count, ].reshape((1, n + 1))
                 yhat = float(self._sigmoid_function(row, theta))
-                theta = theta + alpha * (value - yhat ) * (yhat) * ( 1- yhat) * row.T
+                theta = theta + alpha * (value - yhat )  * row.T
             
         self.theta : np.ndarray = theta
         return None
@@ -68,15 +69,20 @@ class LogisticRegression:
 
 x = np.linspace(-1, 1, 1000).reshape((1000, 1))
 
-y = np.array([1 if i > 0 else 0 for i in x])
+y = np.array([1 if i > 0.8 else 0 for i in x])
 
 
 model = LogisticRegression()
 model.fit(x , y)
 predictions = model.predict(x)
 
+SklearnModel = LR()
+SklearnModel.fit(x, y)
+SklearnPredictions = SklearnModel.predict(x)
+
 
 plt.figure()
 plt.scatter(x , y)
 plt.plot(x , predictions)
+plt.plot(x, SklearnPredictions)
 plt.show()
