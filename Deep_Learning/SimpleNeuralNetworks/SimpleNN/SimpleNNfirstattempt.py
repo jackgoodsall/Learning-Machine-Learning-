@@ -123,47 +123,39 @@ class NeuralNetwork():
         for index, layer in zip(range(len(self.layers)-1, 0, -1), self.layers[::-1]):
             
             if isinstance(layer, OutputLayer):
-                layer.weights -= learn_rate * np.dot(  layer.input.T, kronker_last  )
+    
+                layer.weights -= learn_rate *  layer.input.T @ kronker_last  / np.linalg.norm(layer.input.T @ kronker_last )
 
             else: 
-                kronker_current =    np.dot(kronker_last , last_layer.weights.T) * FunctionUtils.relu_derivitive(layer.output_activation)
+                kronker_current = kronker_last @ last_layer.weights.T * FunctionUtils.relu_derivitive(layer.output_activation)
 
-                layer.weights -= learn_rate * np.dot( self.layers[index-1].output.T , kronker_current)
-        
-                layer.bias -= learn_rate * np.mean(kronker_current, axis= 0, keepdims= True)
+                weight_gradient = self.layers[index-1].output.T @ kronker_current
+                
+                bias_gradient = np.mean(kronker_current, axis= 0, keepdims= True)
+
+                bias_gradient = np.clip(bias_gradient, -0.5, 0.5)
+
+                weight_gradient = weight_gradient /  np.linalg.norm(weight_gradient)
+
+                layer.weights -= learn_rate *  weight_gradient 
+
+                layer.bias -= learn_rate * bias_gradient
                
                 kronker_last = kronker_current
             
 
             last_layer = layer
 
-                
+
+
+ 
+
                 
 
    
     
     
-if __name__ == "__main__" :
-    # Initalise the network
-    network = NeuralNetwork()
-    # Add layers network
-    network.add_input(2)
-    network.add_dense(10)
-    network.add_dense(10)
-    network.add_output(1)
 
-
- 
-
-    x = np.linspace((-0.7, -0.2), (0.8, 0.5), 500)
-    y = np.logspace((0,), (1,), 500)
-
-
-
-    network.train(x, y, epoches = 20000, learn_rate = 0.00001, print_information = True)
-
-    print(network.predict(x))
-    
 
 
 

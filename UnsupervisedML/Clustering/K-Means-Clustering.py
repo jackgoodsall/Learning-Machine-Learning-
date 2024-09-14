@@ -41,7 +41,7 @@ class K_Means:
 
     @staticmethod
     def _EuclideanDistance( X1: np.ndarray, X2: np.ndarray) -> np.ndarray:
-        # Calculate EuclideanDistance between 2 arrays
+        # Calculate Euclidean Distance between 2 arrays
         return np.linalg.norm(X1 - X2, axis = 1)
     
     

@@ -25,7 +25,7 @@ class DenseLayer(NNLayers):
         self.input_size : int = n_inputs
         self.output_size : int = n_neurons
         # Initalise the weights and bias of the dense layer
-        self.weights : np.ndarray = np.random.randn(n_inputs, n_neurons) * np.sqrt(1 / n_inputs)
+        self.weights : np.ndarray = np.random.randn(n_inputs, n_neurons) * np.sqrt(2 / n_inputs)
         self.bias : np.ndarray = np.zeros((1, n_neurons)) 
         '''
         If activation is true set activation function to relu
@@ -83,7 +83,7 @@ class OutputLayer(NNLayers):
     def __init__(self, n_input: int , n_output : int) -> None:
             self.input_size :int = n_output
             self.output_size : int = n_output
-            self.weights : np.ndarray = np.random.randn(n_input, n_output) * np.sqrt(1 / n_input)
+            self.weights : np.ndarray = np.random.randn(n_input, n_output) * np.sqrt(2 / n_input)
     
     
     def _forward(self, input: np.ndarray, activation_function : bool = False) -> np.ndarray:
