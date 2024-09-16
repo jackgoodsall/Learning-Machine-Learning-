@@ -37,7 +37,9 @@ class FunctionUtils:
     @staticmethod
     def softmax(x :  np.ndarray) -> np.ndarray:
         # Static method for softmax 
-        pass
+        numerator = np.exp(x)
+        denominator = np.sum(np.exp(x), axis = 1)
+        return numerator / denominator
     
 
     
