@@ -1,5 +1,5 @@
 import numpy as np
-from NNFunctionUtils import * 
+from Deep_Learning.SimpleNeuralNetworks.Scripts.NNFunctionUtils import * 
 
 
 class NNLayers:
