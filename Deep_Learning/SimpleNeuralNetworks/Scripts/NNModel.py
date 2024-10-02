@@ -7,13 +7,16 @@ class NeuralNetwork():
     First attempt at making a neural network from scratch. At this point never worked with any NN modules so not sure of standard structure of 
     networks like in pytorch and tensorflow. 
     Used some help from google with things like array sizes to help it run with multiple training examples at the same time.
+    Class Atributes:
+    _loss_functions_dict : dict
+        dictionary mapping strings to loss functions from NNFunctionUtils script
     '''
     _loss_functions_dict= {
         "LSE" : CostFunctions.LSE_function,
         "BCEL" : CostFunctions.BCEL_function,
-        "CEL" : CostFunctions.CEL_function,
-        "Default" : CostFunctions.LSE_function
+        "CEL" : CostFunctions.CEL_function
     }
+
 
     def __init__(self) -> None:
         # Initalise the network
@@ -33,11 +36,13 @@ class NeuralNetwork():
         target_data: np.ndarray
             shape(number_datapoints, n_labels)
         '''
+        # Use setter for loss function (converts the str into a function)
         self._loss_function = loss_function
         # Variables to compare costs (might change to save all costs later for plotting purposes but not important rn).
+        # 02/10 - Changed to list
+        costs = np.ndarray((epoches, 1))
         last_cost = 0
-        current_cost = 0
-        for _ in range(epoches):
+        for cur_iteration in range(epoches):
             
             # First forward pass the information
             outputs = self._forward_pass(input_data)
@@ -51,28 +56,28 @@ class NeuralNetwork():
             if abs(last_cost - current_cost) < n_tol:
                 if print_information:
                     print("Network converged! Training finished")
-                    print(f"Converged on a training cost of {current_cost} in {_} epoches")
+                    print(f"Converged on a training cost of {current_cost} in {cur_iteration} epoches")
                 return
             
             last_cost = current_cost
+            costs[cur_iteration] = current_cost
         if print_information:
             print("Training finished")
             print(f"Did not converge in {epoches} epoches, consider changing the learn rate, increasing the tolerance or increasing the number of epoches.")
           
         
     def predict(self, predict_data: np.ndarray) -> np.ndarray:
-        '''
-        Predict values that are fed into the neural network by simpily forward passing the inputs
-        '''
+        '''Predict values that are fed into the neural network by simpily forward passing the inputs'''
         return self._forward_pass(predict_data)
         
     
-    def add_dense(self,  n_neurons : int, activation_function : bool = True) -> None | str:
+    def add_dense(self,  n_neurons : int, activation_function : str = "") -> None | str:
         '''
         Method to add a dense layer to the network class, first checks that a input layer exists and that there isn't an output layer.
-        Will eventualy change the activation_function = True to be able to select from a range of activation functions
-        '''
 
+        Will eventualy change the activation_function = True to be able to select from a range of activation functions
+        02/10 - Changed to use atributes/setters and getters to change activation to str and added more functions.
+        '''
         # Add a dense layer to the network
         if self.has_input_layer == False:
             return "Network does not have an input layer"
@@ -83,9 +88,7 @@ class NeuralNetwork():
         
     
     def add_input(self, input_size : int, activation_function : str = "ReLU") -> None | str:
-        '''
-        Method for adding an input layer to the network, checks that there is no layers added already
-        '''
+        '''Method for adding an input layer to the network, checks that there is no layers added already'''
         if self.layers != None:
             self.layers.append( InputLayer(input_size) )
             self.has_input_layer = True
@@ -125,7 +128,8 @@ class NeuralNetwork():
         '''
         last_layer = self.layers[-1]
         kronker_current = 0
-        kronker_last = last_layer.output - target_values 
+        kronker_last = last_layer.output - target_values
+        
         for index, layer in zip(range(len(self.layers)-1, 0, -1), self.layers[::-1]):
             
             if isinstance(layer, OutputLayer):
@@ -133,7 +137,7 @@ class NeuralNetwork():
                 layer.weights -= learn_rate *  layer.input.T @ kronker_last  / np.linalg.norm(layer.input.T @ kronker_last )
 
             else: 
-                kronker_current = kronker_last @ last_layer.weights.T * FunctionUtils.relu_derivitive(layer.output_activation)
+                kronker_current = kronker_last @ last_layer.weights.T * .relu_derivitive(layer.output_activation)
 
                 weight_gradient = self.layers[index-1].output.T @ kronker_current
                 
@@ -154,17 +158,18 @@ class NeuralNetwork():
 
 
     @property
-    def loss_function(self) -> CostFunctions:
+    def _loss_function(self) -> CostFunctions:
         # Getter for the loss function atribute
-        return self.loss_function
+        return self._loss_function
     
-    @loss_function.setter
-    def loss_function(self, name : str) -> None:
+
+    @_loss_function.setter
+    def _loss_function(self, name : str) -> None:
         '''Setter for the loss function, maps the string to the function in FunctionUtils'''
         if name in self._loss_functions_dict.values():
-            self.loss_function = self._loss_functions_dict[name]
+            self._loss_function = self._loss_functions_dict[name]
         else:
-            self.loss_function = CostFunctions.LSE_function
+            self._loss_function = CostFunctions.LSE_function
 
 
 
