@@ -1,15 +1,20 @@
 import numpy as np
-from Deep_Learning.SimpleNeuralNetworks.Scripts.NNLayerArchitecture import *
+from NNLayerArchitecture import *
 from NNFunctionUtils import * 
 
 class NeuralNetwork():
     '''
     First attempt at making a neural network from scratch. At this point never worked with any NN modules so not sure of standard structure of 
     networks like in pytorch and tensorflow. 
-    Used some help from google with things like array sizes to help it run with multiple training examples at the same time. Maybe should of started 
-    with creating a simpler network first but that's boring. 
-    
+    Used some help from google with things like array sizes to help it run with multiple training examples at the same time.
     '''
+    _loss_functions_dict= {
+        "LSE" : CostFunctions.LSE_function,
+        "BCEL" : CostFunctions.BCEL_function,
+        "CEL" : CostFunctions.CEL_function,
+        "Default" : CostFunctions.LSE_function
+    }
+
     def __init__(self) -> None:
         # Initalise the network
         self.layers : list[ NNLayers ] = []
@@ -19,15 +24,16 @@ class NeuralNetwork():
     
     def train(self, input_data: np.ndarray, target_values: np.ndarray, 
                 epoches : int = 1000, learn_rate : float = 0.01, n_tol : float = 0.00001, 
-                print_information : bool = False) -> None:
+                print_information : bool = False, loss_function : str = "LSE" ) -> None:
         '''
         Train the neural network based on the given input data, for now using whole training examples each time, which I'm pretty sure is both computationally ineffective and 
         worse for learning purposes (will change to batch once it actually works).
         input_data : np.ndarray
             shape(number_datapoints, n_features)
         target_data: np.ndarray
-            shape(number_datapoints, 1)
+            shape(number_datapoints, n_labels)
         '''
+        self._loss_function = loss_function
         # Variables to compare costs (might change to save all costs later for plotting purposes but not important rn).
         last_cost = 0
         current_cost = 0
@@ -37,7 +43,7 @@ class NeuralNetwork():
             outputs = self._forward_pass(input_data)
 
             # Calculate cost function
-            current_cost = FunctionUtils.cost_function(outputs, target_values)
+            current_cost = self._loss_function(outputs, target_values)
 
             # Back propagate
             self._back_propagation(target_values, learn_rate)
@@ -76,7 +82,7 @@ class NeuralNetwork():
             self.layers.append( DenseLayer(self.layers[-1].output_size, n_neurons, activation = activation_function) )            
         
     
-    def add_input(self, input_size : int, ) -> None | str:
+    def add_input(self, input_size : int, activation_function : str = "ReLU") -> None | str:
         '''
         Method for adding an input layer to the network, checks that there is no layers added already
         '''
@@ -145,6 +151,20 @@ class NeuralNetwork():
             
 
             last_layer = layer
+
+
+    @property
+    def loss_function(self) -> CostFunctions:
+        # Getter for the loss function atribute
+        return self.loss_function
+    
+    @loss_function.setter
+    def loss_function(self, name : str) -> None:
+        '''Setter for the loss function, maps the string to the function in FunctionUtils'''
+        if name in self._loss_functions_dict.values():
+            self.loss_function = self._loss_functions_dict[name]
+        else:
+            self.loss_function = CostFunctions.LSE_function
 
 
 

@@ -2,24 +2,24 @@ import numpy as np
 
 class FunctionUtils:
     '''
-        Class contain static methods need for NN architecture
+    Class containing static methods of functions used in Neural networks
     '''
 
     @staticmethod
-    def cost_function(obtained_values: np.ndarray, expected_values : np.ndarray) -> np.ndarray:
-        # Calculate LSE cost function between obtained and expected values
+    def LSE_function(predicted_values: np.ndarray, expected_values : np.ndarray) -> np.ndarray:
+        # Calculate LSE cost function between predicted and expected values
 
-        numerator = np.sum((obtained_values - expected_values)**2, axis = 0)
-        denom  =  2 
-        return numerator/ denom
+        numerator = np.sum((predicted_values - expected_values)**2, axis = 0)
+        denominator  =  2 * predicted_values.shape[0]
+        return numerator/ denominator
     
 
     @staticmethod
-    def cost_function_derivitive(obtained_values: np.ndarray, expected_values : np.ndarray) -> np.ndarray:
+    def LSE_derivitive(predicted_values: np.ndarray, expected_values : np.ndarray) -> np.ndarray:
         # Calculate LSE cost function between obtained and expected values
-
-        numerator = np.sum(obtained_values - expected_values, axis = 0)
-        return numerator
+        numerator = np.sum(predicted_values - expected_values, axis = 0)
+        denominator = predicted_values.shape[0]
+        return numerator / denominator
     
 
     @staticmethod
@@ -41,5 +41,24 @@ class FunctionUtils:
         denominator = np.sum(np.exp(x), axis = 1)
         return numerator / denominator
     
+    @staticmethod
+    def softmax_derivitive(x: np.ndarray) -> np.ndarray:
+        # Static method for softmax derivitive
+        pass
 
+    @staticmethod
+    def BCEL_function(predicted_label : np.ndarray, actual_label : np.ndarray) -> np.ndarray:
+        # Static method for Binary Cross Entropy loss
+        return NotImplementedError
+
+    @staticmethod
+    def BCEL_function_derivitive(predicted_label : np.ndarray, actual_label : np.ndarray) -> np.ndarray:
+        return NotImplementedError
     
+
+    def CEL_function(predicted_labels : np.ndarray, actual_labels : np.ndarray) -> np.ndarray:
+        return FileNotFoundError
+    
+
+    def CEL_function_derivitive(predicted_labels : np.ndarray, actual_labels : np.ndarray) -> np.ndarray:
+        return FileNotFoundError
