@@ -124,36 +124,42 @@ class NeuralNetwork():
 
     def _back_propagation(self, target_values : np.ndarray, learn_rate : float) -> None:
         '''
-        Private method for back propagating through the network
+        Private method for back propagating and optimising the paramaters in the neural network.
         '''
+        # Starting with the last layer
         last_layer = self.layers[-1]
+        # Set Current delta function to 0, so can use variable later
         kronker_current = 0
-        kronker_last = last_layer.output - target_values
+        # Set Current delta equal to derivitve of our cost function
+        kronker_last = CostFunctions_derivitives.self._loss_function
         
+        # Loop backwards through the layer
         for index, layer in zip(range(len(self.layers)-1, 0, -1), self.layers[::-1]):
             
+            # If layer is output then don't need to update bias, currently not supported for activation on output will change later.
             if isinstance(layer, OutputLayer):
-    
+                # W -> W - lr * X.T * delta
                 layer.weights -= learn_rate *  layer.input.T @ kronker_last  / np.linalg.norm(layer.input.T @ kronker_last )
-
+            # If any other layer need bias update
             else: 
-                kronker_current = kronker_last @ last_layer.weights.T * .relu_derivitive(layer.output_activation)
+                # Current delta function
+                # 
+                kronker_current = kronker_last @ last_layer.weights.T * ActivationFunction_Derivities.layer._activation_funcion(layer.output_activation)
 
                 weight_gradient = self.layers[index-1].output.T @ kronker_current
                 
+                # Bias gradient is mean value of kronker along column, size (1, n_neurons)
                 bias_gradient = np.mean(kronker_current, axis= 0, keepdims= True)
-
+                # Clip gradient to stop them exploding
                 bias_gradient = np.clip(bias_gradient, -0.5, 0.5)
-
+                # Normalise weight gradients to stop them exploding
                 weight_gradient = weight_gradient /  np.linalg.norm(weight_gradient)
-
+                # Update layer and weights 
                 layer.weights -= learn_rate *  weight_gradient 
-
                 layer.bias -= learn_rate * bias_gradient
-               
-                kronker_last = kronker_current
-            
-
+                # Set last kronker to current one
+                kronker_last = kronker_current  
+            # Set last layer to current one
             last_layer = layer
 
 
