@@ -27,14 +27,14 @@ class NNLayers:
     
 
     @property
-    def _activation_function(self) -> ActivationFunctions:
+    def activation_function(self) -> ActivationFunctions:
         return self._activation_function
     
 
-    @_activation_function.setter
-    def _activation_function(self, activation_name : str) -> ActivationFunctions:
+    @activation_function.setter
+    def activation_function(self, activation_name : str) -> ActivationFunctions:
         ''' Setter for activaiton function, maps str to function in activation functions'''
-        if activation_name in self._activation_function_dict.values():
+        if activation_name in self._activation_function_dict.keys():
             self._activation_function = self._activation_function_dict[activation_name]
         else:
             self._activation_function = self._activation_function_dict["None"]
@@ -66,7 +66,7 @@ class DenseLayer(NNLayers):
         Changed above to use getters and setters for easy use of multiple activation functions, saving above comment to keep track of progress.
         Default choice is None current implemented by returning False
         '''
-        self._activation_function = activation
+        self.activation_function = activation
             
 
     def _forward(self, input: np.ndarray) -> np.ndarray:
@@ -80,7 +80,7 @@ class DenseLayer(NNLayers):
         # If activation is used
         # not sure if easier or better way to do this but doesnt matter for now
         try:
-            self.output = self._activation_function(self.output)
+            self.output = self.activation_function(self.output)
         except:
             pass
         return self.output
@@ -112,13 +112,13 @@ class OutputLayer(NNLayers):
             self.input_size : int = n_output
             self.output_size : int = n_output
             self.weights : np.ndarray = np.random.randn(n_input, n_output) * np.sqrt(2 / n_input)
-            self._activation_function = activation_function
+            self.activation_function = activation_function
     
     def _forward(self, input: np.ndarray) -> np.ndarray:
         self.input = input
         self.output =  np.dot(input, self.weights) 
         try:
-            self.output = self._activation_function(self.output)
+            self.output = self.activation_function(self.output)
         except: 
             pass
         return self.output

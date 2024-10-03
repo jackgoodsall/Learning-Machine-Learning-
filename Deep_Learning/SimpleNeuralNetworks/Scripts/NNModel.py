@@ -131,7 +131,7 @@ class NeuralNetwork():
         # Set Current delta function to 0, so can use variable later
         kronker_current = 0
         # Set Current delta equal to derivitve of our cost function
-        kronker_last = CostFunctions_derivitives.self._loss_function
+        kronker_last = CostFunctions_derivitives.self._loss_function(last_layer.output, target_values)
         
         # Loop backwards through the layer
         for index, layer in zip(range(len(self.layers)-1, 0, -1), self.layers[::-1]):
@@ -166,16 +166,16 @@ class NeuralNetwork():
     @property
     def _loss_function(self) -> CostFunctions:
         # Getter for the loss function atribute
-        return self._loss_function
+        return self._internal_loss_function
     
 
     @_loss_function.setter
     def _loss_function(self, name : str) -> None:
         '''Setter for the loss function, maps the string to the function in FunctionUtils'''
-        if name in self._loss_functions_dict.values():
-            self._loss_function = self._loss_functions_dict[name]
+        if name in self._loss_functions_dict.keys():
+            self._internal_loss_function = self._loss_functions_dict[name]
         else:
-            self._loss_function = CostFunctions.LSE_function
+            self._internal_loss_function = CostFunctions.LSE_function
 
 
 
