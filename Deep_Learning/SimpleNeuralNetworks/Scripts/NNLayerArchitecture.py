@@ -10,7 +10,12 @@ class NNLayers:
     _activation_function_dict = {
         "ReLU" : ActivationFunctions.relu,
         "Softmax" : ActivationFunctions.softmax,
-        "None" : False
+        "None" : ActivationFunctions.no_activation
+    }
+    _activation_derivitive_function_dict = {
+        "ReLU" : ActivationFunctionDerivites.relu,
+        "Softmax" : ActivationFunctionDerivites.softmax,
+        "None" : ActivationFunctionDerivites.no_activation
     }
 
 
@@ -36,8 +41,10 @@ class NNLayers:
         ''' Setter for activaiton function, maps str to function in activation functions'''
         if activation_name in self._activation_function_dict.keys():
             self._activation_function = self._activation_function_dict[activation_name]
+            self._activation_derivitive = self._activation_derivitive_function_dict[activation_name]
         else:
             self._activation_function = self._activation_function_dict["None"]
+            self._activation_derivitive = self._activation_derivitive_function_dict["None"]
 
 
 class DenseLayer(NNLayers):
@@ -83,6 +90,7 @@ class DenseLayer(NNLayers):
             self.output = self.activation_function(self.output)
         except:
             pass
+        self.output_derivitive = self._activation_derivitive(self.output)
         return self.output
            
 
@@ -121,4 +129,5 @@ class OutputLayer(NNLayers):
             self.output = self.activation_function(self.output)
         except: 
             pass
+        self.output_derivitive = self._activation_derivitive(self.output)
         return self.output

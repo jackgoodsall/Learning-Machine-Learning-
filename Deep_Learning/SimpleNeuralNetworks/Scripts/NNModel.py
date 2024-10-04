@@ -12,9 +12,9 @@ class NeuralNetwork():
         dictionary mapping strings to loss functions from NNFunctionUtils script
     '''
     _loss_functions_dict= {
-        "LSE" : CostFunctions.LSE_function,
-        "BCEL" : CostFunctions.BCEL_function,
-        "CEL" : CostFunctions.CEL_function
+        "LSE" : CostFunctions.LSE,
+        "BCEL" : CostFunctions.BCEL,
+        "CEL" : CostFunctions.CEL
     }
 
 
@@ -40,6 +40,7 @@ class NeuralNetwork():
         self._loss_function = loss_function
         # Variables to compare costs (might change to save all costs later for plotting purposes but not important rn).
         # 02/10 - Changed to list
+        _loss_function = self._loss_functions_dict[self._loss_function]
         costs = np.ndarray((epoches, 1))
         last_cost = 0
         for cur_iteration in range(epoches):
@@ -48,7 +49,7 @@ class NeuralNetwork():
             outputs = self._forward_pass(input_data)
 
             # Calculate cost function
-            current_cost = self._loss_function(outputs, target_values)
+            current_cost = _loss_function(outputs, target_values)
 
             # Back propagate
             self._back_propagation(target_values, learn_rate)
@@ -129,27 +130,31 @@ class NeuralNetwork():
         # Starting with the last layer
         last_layer = self.layers[-1]
         # Set Current delta function to 0, so can use variable later
-        kronker_current = 0
+        deltas_list = []
         # Set Current delta equal to derivitve of our cost function
-        kronker_last = CostFunctions_derivitives.self._loss_function(last_layer.output, target_values)
         
+        _loss_function_derivitive = getattr(CostFunctionsDerivitives, self._loss_function)
+
+        deltas_list.insert(0, _loss_function_derivitive(last_layer.output, target_values))
+
         # Loop backwards through the layer
         for index, layer in zip(range(len(self.layers)-1, 0, -1), self.layers[::-1]):
             
             # If layer is output then don't need to update bias, currently not supported for activation on output will change later.
             if isinstance(layer, OutputLayer):
                 # W -> W - lr * X.T * delta
-                layer.weights -= learn_rate *  layer.input.T @ kronker_last  / np.linalg.norm(layer.input.T @ kronker_last )
+                layer.weights -= learn_rate *  layer.input.T @ deltas_list[-1]  / np.linalg.norm(layer.input.T @ deltas_list[-1] )
             # If any other layer need bias update
             else: 
                 # Current delta function
                 # 
-                kronker_current = kronker_last @ last_layer.weights.T * ActivationFunction_Derivities.layer._activation_funcion(layer.output_activation)
-
-                weight_gradient = self.layers[index-1].output.T @ kronker_current
+                
+                deltas_list.insert(0, deltas_list[0] @ last_layer.weights.T * layer.output_derivitive )
+              
+                weight_gradient = self.layers[index-1].output.T @ deltas_list[0]
                 
                 # Bias gradient is mean value of kronker along column, size (1, n_neurons)
-                bias_gradient = np.mean(kronker_current, axis= 0, keepdims= True)
+                bias_gradient = np.mean(deltas_list[0], axis= 0, keepdims= True)
                 # Clip gradient to stop them exploding
                 bias_gradient = np.clip(bias_gradient, -0.5, 0.5)
                 # Normalise weight gradients to stop them exploding
@@ -158,7 +163,7 @@ class NeuralNetwork():
                 layer.weights -= learn_rate *  weight_gradient 
                 layer.bias -= learn_rate * bias_gradient
                 # Set last kronker to current one
-                kronker_last = kronker_current  
+  
             # Set last layer to current one
             last_layer = layer
 
@@ -173,9 +178,9 @@ class NeuralNetwork():
     def _loss_function(self, name : str) -> None:
         '''Setter for the loss function, maps the string to the function in FunctionUtils'''
         if name in self._loss_functions_dict.keys():
-            self._internal_loss_function = self._loss_functions_dict[name]
+            self._internal_loss_function = name
         else:
-            self._internal_loss_function = CostFunctions.LSE_function
+            self._internal_loss_function = "LSE"
 
 
 
