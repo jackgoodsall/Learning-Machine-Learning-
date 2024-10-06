@@ -66,6 +66,11 @@ class ActivationFunctions:
     
 
     @staticmethod
+    def sigmoid(x: np.ndarray) -> np.ndarray:
+        # Static method for sigmoid function
+        return np.where(x >= 0 , 1 / (1 + np.exp(-x)), np.exp(x) / (1 + np.exp(x)))
+
+    @staticmethod
     def relu(x: np.ndarray) -> np.ndarray:
         # Static method  for relu
         # max(0, x)
@@ -90,6 +95,13 @@ class ActivationFunctionDerivites:
     def softmax(x: np.ndarray) -> np.ndarray:
         # Static method for softmax derivitive
         pass
+
+    
+    @staticmethod
+    def sigmoid(x : np.ndarray) -> np.ndarray:
+        f_x = ActivationFunctions.sigmoid(x)
+        return f_x * (1 - f_x )
+    
 
     @staticmethod
     def no_activation(x : np.ndarray) -> np.ndarray:

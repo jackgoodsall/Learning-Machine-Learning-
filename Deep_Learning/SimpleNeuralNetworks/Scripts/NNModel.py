@@ -97,7 +97,7 @@ class NeuralNetwork():
             return "Network already has an input layer"
 
 
-    def add_output(self, output_size:int) -> None | str:
+    def add_output(self, output_size:int, activation_function : str= "") -> None | str:
         '''
         Method for adding output layer to the network, checks that it has an input layer and that it doesnt already have an output layer, should really check to make sure 
         a dense layer exists but who is creating an network that is just an input and output layer.
@@ -109,7 +109,7 @@ class NeuralNetwork():
         elif self.has_outout_layer:
             return "Network already has an output layer"
         else:
-            self.layers.append( OutputLayer(self.layers[-1].output_size, output_size) )
+            self.layers.append( OutputLayer(self.layers[-1].output_size, output_size, activation_function = activation_function) )
             self.has_outout_layer = True
 
             
