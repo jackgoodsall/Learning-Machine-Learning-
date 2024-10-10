@@ -10,11 +10,13 @@ class NNLayers:
     _activation_function_dict = {
         "ReLU" : ActivationFunctions.relu,
         "Softmax" : ActivationFunctions.softmax,
+        "Sigmoid" : ActivationFunctions.sigmoid,
         "None" : ActivationFunctions.no_activation
     }
     _activation_derivitive_function_dict = {
         "ReLU" : ActivationFunctionDerivites.relu,
         "Softmax" : ActivationFunctionDerivites.softmax,
+        "Sigmoid" : ActivationFunctionDerivites.sigmoid,
         "None" : ActivationFunctionDerivites.no_activation
     }
 
