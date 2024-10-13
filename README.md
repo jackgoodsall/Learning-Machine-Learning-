@@ -2,4 +2,6 @@
 
 
 
-###
+## Projects
+
+[Pnumonia x-ray classification](https://github.com/jackgoodsall/PneumoniaCVProblem) 
