@@ -15,9 +15,14 @@ class CostFunctions:
     
 
     @staticmethod
-    def BCEL(predicted_label : np.ndarray, actual_label : np.ndarray) -> np.ndarray:
+    def BCEL(predicted_values : np.ndarray, actual_label : np.ndarray) -> np.ndarray:
         # Static method for Binary Cross Entropy loss
-        return NotImplementedError
+        y_pred = ActivationFunctions.sigmoid(predicted_values)
+
+        loss = -1 * np.mean(actual_label * np.log(y_pred) + (1-actual_label) * np.log(1- y_pred), axis =0 )
+       
+
+        return loss
 
     @staticmethod
     def CEL(predicted_labels : np.ndarray, actual_labels : np.ndarray) -> np.ndarray:
@@ -46,8 +51,9 @@ class CostFunctionsDerivitives:
 
 
     @staticmethod
-    def BCEL(predicted_label : np.ndarray, actual_label : np.ndarray) -> np.ndarray:
-        return NotImplementedError
+    def BCEL(predicted_proba : np.ndarray, actual_label : np.ndarray) -> np.ndarray:
+        return predicted_proba - actual_label
+    
        
 
     
@@ -60,6 +66,7 @@ class ActivationFunctions:
     @staticmethod
     def softmax(x :  np.ndarray) -> np.ndarray:
         # Static method for softmax 
+        x = x - max(x)
         numerator = np.exp(x)
         denominator = np.sum(np.exp(x), axis = 1)
         return numerator / denominator

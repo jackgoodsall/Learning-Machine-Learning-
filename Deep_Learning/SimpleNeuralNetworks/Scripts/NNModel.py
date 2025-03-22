@@ -143,7 +143,7 @@ class NeuralNetwork():
             # If layer is output then don't need to update bias, currently not supported for activation on output will change later.
             if isinstance(layer, OutputLayer):
                 # W -> W - lr * X.T * delta
-                layer.weights -= learn_rate *  layer.input.T @ deltas_list[-1]  / np.linalg.norm(layer.input.T @ deltas_list[-1] )
+                layer.weights -= learn_rate *  layer.input.T @ deltas_list[-1]  / np.linalg.norm(layer.input.T @ deltas_list[-1] ) 
             # If any other layer need bias update
             else: 
                 # Current delta function
@@ -156,9 +156,9 @@ class NeuralNetwork():
                 # Bias gradient is mean value of kronker along column, size (1, n_neurons)
                 bias_gradient = np.mean(deltas_list[0], axis= 0, keepdims= True)
                 # Clip gradient to stop them exploding
-                bias_gradient = np.clip(bias_gradient, -0.5, 0.5)
+                bias_gradient = np.clip(bias_gradient, -0.5, 0.5) 
                 # Normalise weight gradients to stop them exploding
-                weight_gradient = weight_gradient /  np.linalg.norm(weight_gradient)
+                weight_gradient = weight_gradient /  np.linalg.norm(weight_gradient) 
                 # Update layer and weights 
                 layer.weights -= learn_rate *  weight_gradient 
                 layer.bias -= learn_rate * bias_gradient
@@ -166,14 +166,12 @@ class NeuralNetwork():
   
             # Set last layer to current one
             last_layer = layer
-
-
+   
     @property
     def _loss_function(self) -> CostFunctions:
         # Getter for the loss function atribute
         return self._internal_loss_function
     
-
     @_loss_function.setter
     def _loss_function(self, name : str) -> None:
         '''Setter for the loss function, maps the string to the function in FunctionUtils'''
